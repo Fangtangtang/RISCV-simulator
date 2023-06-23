@@ -13,6 +13,7 @@ using RegisterUnit = int32_t;
 using RegisterIndex = uint8_t;
 using TwoBytes = uint16_t;
 
+using Index = int8_t;
 using Number = int32_t;
 using UnsignedNumber = uint32_t;
 using Word = int32_t;
