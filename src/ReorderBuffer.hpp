@@ -15,7 +15,8 @@ class RoBType {
     bool ready = false;//ready to commit?
     InstructionType type;
     Byte dest;//dest reg
-    Number value = 0;
+    Number value = 0; //if instruction is conditional branch, record the other address
+    bool predict = false; //predict whether to branch
 };
 
 class ReorderBuffer {

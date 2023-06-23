@@ -16,14 +16,16 @@
 
 #include <utility>
 #include "../include/type.hpp"
+#include "../tool/register.hpp"
 
 class RFType {
-    Number value;
+    Number value{};
     Index dependence = -1;
 };
 
 class RegisterFile {
     RFType storage[32];
+    RFType PC;
 
 public:
     /*

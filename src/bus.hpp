@@ -12,7 +12,7 @@
 #include <utility>
 #include <vector>
 
-class SDB {
+class CDB {
     std::vector<std::pair<Index, Number>> storage;
 
 public:

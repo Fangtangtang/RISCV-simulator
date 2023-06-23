@@ -22,7 +22,7 @@ class SBType {
     Index RoB;//entry in RoB
 };
 
-class LoadBuffer {
+class StoreBuffer {
     Queue<SBType> SBQueue{8};
     Byte timer;//count time
 
@@ -42,7 +42,8 @@ class LoadBuffer {
 
     /*
      * remove dependence
-     * TODO traverse to modify?
+     * TODO
+     * traverse to modify?
      */
     void Modify(const Index &entry, const Number &value);
 };
