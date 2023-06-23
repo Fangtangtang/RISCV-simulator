@@ -30,8 +30,9 @@ class ReorderBuffer {
 
     /*
      * modify ele in RoB
+     * return dest
      */
-    void Modify(const Index &entry, const Number &value);
+    Byte Modify(const Index &entry, const Number &value);
 
     /*
      * commit all the ready ones

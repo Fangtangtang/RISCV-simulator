@@ -25,11 +25,25 @@ class LoadBuffer {
     Byte timer;//count time
 
     /*
+     * whether LBQueue have spare space for new instruction
+     */
+    bool Full();
+
+    void AddInstruction(const Instruction &instruction, const Index &entry);
+
+    /*
      * execute in one clock cycle
      * return entry in RoB and the result
      * if nothing finish executing return -1
      */
     Index Execute(Number &result);
+
+    /*
+     * remove dependence
+     * TODO traverse to modify?
+     */
+    void Modify(const Index &entry, const Number &value);
+
 };
 
 #endif //CODE_LOADBUFFER_HPP
