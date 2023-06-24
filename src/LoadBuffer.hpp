@@ -11,6 +11,7 @@
 #include "../include/type.hpp"
 #include "../tool/decoder.hpp"
 #include "../tool/memory.hpp"
+#include "bus.hpp"
 
 class LBType {
     InstructionType type;
@@ -23,7 +24,7 @@ class LBType {
 class LoadBuffer {
     Queue<LBType> LBQueue{8};
     Byte timer;//count time
-
+public:
     /*
      * whether LBQueue have spare space for new instruction
      */
@@ -33,16 +34,15 @@ class LoadBuffer {
 
     /*
      * execute in one clock cycle
-     * return entry in RoB and the result
-     * if nothing finish executing return -1
+     * if executed, push into bus
      */
-    Index Execute(Number &result);
+    void Execute(CDB &bus);
 
     /*
      * remove dependence
      * TODO traverse to modify?
      */
-    void Modify(const Index &entry, const Number &value);
+    void Modify(const std::pair<Index, Number> &pair);
 
 };
 

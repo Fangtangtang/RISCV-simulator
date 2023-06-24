@@ -11,6 +11,7 @@
 #include "../include/type.hpp"
 #include "../tool/decoder.hpp"
 #include "../tool/memory.hpp"
+#include "bus.hpp"
 
 class SBType {
     InstructionType type;
@@ -25,7 +26,7 @@ class SBType {
 class StoreBuffer {
     Queue<SBType> SBQueue{8};
     Byte timer;//count time
-
+public:
     /*
      * whether SBQueue have spare space for new instruction
      */
@@ -35,17 +36,16 @@ class StoreBuffer {
 
     /*
      * execute in one clock cycle
-     * return entry in RoB
-     * if nothing finish executing return -1
+     * if executed, push into bus
      */
-    Index Execute();
+    void Execute(CDB &bus);
 
     /*
      * remove dependence
      * TODO
      * traverse to modify?
      */
-    void Modify(const Index &entry, const Number &value);
+    void Modify(const std::pair<Index, Number> &pair);
 };
 
 #endif //CODE_STOREBUFFER_HPP

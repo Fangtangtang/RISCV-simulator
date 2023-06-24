@@ -19,6 +19,8 @@ public:
 
     void Add(const Index &entry, Number &value);
 
+    int Size() const;
+
     std::pair<Index, Number> GetEle(const int &i) const;
 
     void Clear();

@@ -8,13 +8,9 @@ class Registers;
 
 class Memory;
 
-class Register {
+struct Register {
     RegisterUnit pre_state = 0;
     RegisterUnit after_state = 0;
-
-    friend class Registers;
-
-    friend class Memory;
 };
 
 class Registers {

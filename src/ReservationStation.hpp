@@ -10,6 +10,7 @@
 #include "../include/type.hpp"
 #include "../tool/decoder.hpp"
 #include "../tool/ALU.hpp"
+#include "bus.hpp"
 
 class RSType {
     bool busy = false;
@@ -22,7 +23,7 @@ class RSType {
 
 class ReservationStation {
     RSType RS[8];
-
+public:
     /*
      * return index of RS if is not busy
      * return -1 if full
@@ -36,16 +37,15 @@ class ReservationStation {
 
     /*
      * execute in one clock cycle
-     * return entry in RoB and the result
-     * if nothing finish executing return -1
+     * if executed, push into bus
      */
-    Index Execute(Number &result);
+    void Execute(CDB &bus);
 
     /*
      * remove dependence
      * traverse RS to modify
      */
-    void Modify(const Index &entry, const Number &value);
+    void Modify(const std::pair<Index, Number> &pair);
 
 };
 
