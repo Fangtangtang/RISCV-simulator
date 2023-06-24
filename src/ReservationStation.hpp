@@ -21,6 +21,29 @@ class RSType {
     Index RoB;
 };
 
+class PCReservationStation {
+    bool busy = false;
+    Number Imme;
+    Index Q;
+    Index RoB;
+public:
+    void AddInstruction(const Instruction &instruction, const Index &entry);
+
+    /*
+     * if not bust return false
+     * if Q==-1
+     * modify pc,  push into bus
+     * return true
+     */
+    bool Execute(CDB &bus, RegisterUnit &pc);
+
+    /*
+     * remove dependence
+     */
+    void Modify(const std::pair<Index, Number> &pair);
+
+};
+
 class ReservationStation {
     RSType RS[8];
 public:

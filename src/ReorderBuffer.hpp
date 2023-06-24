@@ -39,14 +39,18 @@ public:
 class ReorderBuffer {
     Queue<RoBType> RoBQueue{8};
 
-    Index AddInstruction(const Instruction &instruction, bool ready_ = false);
+    Index AddInstruction(const Instruction &instruction);
+
+    Index AddInstruction(const Instruction &instruction, RegisterUnit &pc);
 
     Index AddInstruction(const Instruction &instruction, const bool &predict, const Number &value);
 
     /*
      * update pc to the addr of next fetched instruction
      */
-    Number UpdatePC(const Instruction &instruction, const bool &predict, Register &pc);
+    void UpdatePC(const Instruction &instruction, RegisterUnit &pc);
+
+    Number UpdatePC(const Instruction &instruction, const bool &predict, RegisterUnit &pc);
 
 public:
     /*
@@ -55,7 +59,9 @@ public:
      * else return entry(index in RoBQueue.storage)
      */
     Index AddInstruction(const Instruction &instruction, const RegisterFile &registerFile, const Predictor &predictor,
-                         ReservationStation &RS, StoreBuffer &storeBuffer, LoadBuffer &loadBuffer, Register &pc);
+                         ReservationStation &RS, StoreBuffer &storeBuffer,
+                         LoadBuffer &loadBuffer, PCReservationStation &pcReservationStation,
+                         RegisterUnit &pc);
 
     /*
      * modify ele in RoB
@@ -75,13 +81,42 @@ public:
  * private
  */
 
-Index ReorderBuffer::AddInstruction(const Instruction &instruction, bool ready_) {
+Index ReorderBuffer::AddInstruction(const Instruction &instruction) {
     RoBType tmp(instruction);
-    if (ready_) tmp.ready = true;
+    return RoBQueue.EnQueue(tmp);
+}
+
+Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterUnit &pc) {
+    RoBType tmp(instruction);
+    tmp.ready = true;
+    switch (instruction.instructionType) {
+        case LUI:
+            tmp.value = instruction.immediate;
+            pc += 4;
+            break;
+        case AUIPC:
+            tmp.value = instruction.immediate + pc;
+            pc += 4;
+            break;
+        case JAL:
+            tmp.value = pc + 4;
+            pc += instruction.immediate;
+            break;
+        default:
+            break;
+    }
     return RoBQueue.EnQueue(tmp);
 }
 
 Index ReorderBuffer::AddInstruction(const Instruction &instruction, const bool &predict, const Number &value) {
+
+}
+
+void ReorderBuffer::UpdatePC(const Instruction &instruction, RegisterUnit &pc) {
+
+}
+
+Number ReorderBuffer::UpdatePC(const Instruction &instruction, const bool &predict, RegisterUnit &pc) {
 
 }
 
@@ -91,8 +126,10 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const bool &
 Index ReorderBuffer::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile,
                                     const Predictor &predictor,
                                     ReservationStation &RS, StoreBuffer &storeBuffer, LoadBuffer &loadBuffer,
-                                    Register &pc) {
-    if (RoBQueue.Full())return -1;
+                                    PCReservationStation &pcReservationStation,
+                                    RegisterUnit &pc) {
+    if (RoBQueue.Full())
+        return -1;
     Index ind, entry;
     Number value;
     bool predict;
@@ -103,17 +140,19 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const Regist
         case LW:
         case LBU:
         case LHU:
-            if (loadBuffer.Full())return -1;
-            pc.after_state = pc.pre_state + 4;
+            if (loadBuffer.Full())
+                return -1;
+            pc += 4;
             entry = AddInstruction(instruction);
             loadBuffer.AddInstruction(instruction, entry);
             return entry;
-            //StoreBuffer
+        //StoreBuffer
         case SB:
         case SH:
         case SW:
-            if (storeBuffer.Full())return -1;
-            pc.after_state = pc.pre_state + 4;
+            if (storeBuffer.Full())
+                return -1;
+            pc += 4;
             entry = AddInstruction(instruction);
             storeBuffer.AddInstruction(instruction, entry);
             return entry;
@@ -144,16 +183,19 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const Regist
         case AND:
             ind = RS.GetSpace();
             if (ind < 0)return -1;
-            predict=predictor.Predict();
+            predict = predictor.Predict();
             value = UpdatePC(instruction, predict, pc);
-            entry = AddInstruction(instruction, predict,value);
+            entry = AddInstruction(instruction, predict, value);
             RS.AddInstruction(ind, instruction, entry);
             return entry;
         case LUI:
         case AUIPC:
         case JAL:
-        case JALR:
-            return AddInstruction(instruction, true);
+            return AddInstruction(instruction, pc);
+        case JALR://special pc depend on nrs1
+            entry = AddInstruction(instruction);
+            pcReservationStation.AddInstruction(instruction,entry);
+            return entry;
         default://no need to add into buffer(WAIT)
             return -1;
     }
