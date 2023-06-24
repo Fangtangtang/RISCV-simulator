@@ -13,7 +13,7 @@ class Predictor{
 
 public:
 
-    bool Predict();
+    bool Predict() const;
 
     /*
      * whether branch

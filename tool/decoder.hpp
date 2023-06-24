@@ -149,6 +149,10 @@ public:
  * ----------------------------------------------------------------------------------
  */
 void Decoder::Decode(const MachineCode &machineCode, Instruction &instruction) {
+    if(machineCode==0) {
+        instruction.instructionType = WAIT;
+        return;
+    }
     Byte opcode = GetOpcode(machineCode);
     instruction.rs1 = instruction.rs2 = instruction.rd = 32;//not used
     switch (opcode) {
