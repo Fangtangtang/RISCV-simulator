@@ -42,6 +42,10 @@ public:
         return rear;
     }
 
+    T GetEle(const Index &ind) {
+        return storage[ind];
+    }
+
     void Modify(const T &ele, const Index &ind) {
         storage[ind] = ele;
     }

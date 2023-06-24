@@ -42,7 +42,7 @@ public:
     /*
      * return dependence or value of RF[ind]
      */
-    Index GetValue(const Byte &ind, Number &value);
+    Index GetValue(const Byte &ind, Number &value)const;
 };
 
 #endif //CODE_REGFILE_HPP

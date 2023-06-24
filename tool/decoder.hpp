@@ -74,7 +74,7 @@ enum InstructionType {
      * end of program
      */
     EXIT // 0x0ff00513
-    ,WAIT
+    , WAIT
 };
 
 /*
@@ -149,7 +149,7 @@ public:
  * ----------------------------------------------------------------------------------
  */
 void Decoder::Decode(const MachineCode &machineCode, Instruction &instruction) {
-    if(machineCode==0) {
+    if (machineCode == 0) {
         instruction.instructionType = WAIT;
         return;
     }
@@ -204,6 +204,9 @@ void Decoder::Decode(const MachineCode &machineCode, Instruction &instruction) {
             }
             instruction.rd = RegisterDestination(machineCode);
             instruction.rs1 = RegisterSource1(machineCode);
+            if (instruction.instructionType == ADDI && instruction.rs1 == 0 && instruction.rd == 10 &&
+                instruction.immediate == 255)
+                instruction.instructionType = EXIT;
             return;
         case 0b0110011:
             DetermineRType(machineCode, instruction);
@@ -404,12 +407,12 @@ Number Decoder::ImmB(const MachineCode &machineCode) {
     tmp |= ((machineCode >> 25) & ((1 << 6) - 1));
     tmp <<= 4;
     tmp |= ((machineCode >> 8) & ((1 << 4) - 1));
-    tmp<<=1;
+    tmp <<= 1;
     return SignExtend(tmp, 13);
 }
 
 Number Decoder::ImmU(const MachineCode &machineCode) {
-    Number tmp(((UnsignedNumber)machineCode >> 12) & ((1 << 20) - 1));
+    Number tmp(((UnsignedNumber) machineCode >> 12) & ((1 << 20) - 1));
     tmp <<= 12;
     return tmp;
 }

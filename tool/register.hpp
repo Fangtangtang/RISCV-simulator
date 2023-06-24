@@ -21,6 +21,8 @@ class Registers {
 
 public:
 
+    inline void Update(const Byte &ind, const Number &value);
+
     //有哪几个要更新
     void ReadRegister(const Instruction &instruction, Number &nrs1, Number &nrs2);
 
@@ -31,6 +33,10 @@ public:
 
     void Print();
 };
+
+void Registers::Update(const Byte &ind, const Number &value) {
+    aRegister[ind] = value;
+}
 
 void Registers::ReadRegister(const Instruction &instruction, Number &nrs1, Number &nrs2) {
     if (instruction.rs1 < 32) nrs1 = aRegister[instruction.rs1];

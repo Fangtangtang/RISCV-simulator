@@ -2,6 +2,10 @@
 #include "src/bus.hpp"
 #include "tool/memory.hpp"
 #include "src/predictor.hpp"
+#include "src/RegFile.hpp"
+#include "src/ReservationStation.hpp"
+#include "src/StoreBuffer.hpp"
+#include "src/LoadBuffer.hpp"
 
 int main() {
     Decoder decoder;
@@ -45,7 +49,7 @@ int main() {
         //EX MEM
         if (!IP_flag && pcRS.Execute(bus, pc))
             IP_flag = true;
-        RS.Execute(bus);
+        RS.Execute(bus,alu);
         loadBuffer.Execute(bus);
         storeBuffer.Execute(bus);
         size_ = bus.Size();
@@ -55,7 +59,7 @@ int main() {
             loadBuffer.Modify(pair);
             storeBuffer.Modify(pair);
             if (!IP_flag)pcRS.Modify(pair);
-            dest = RoB.Modify(pair);
+            dest = RoB.Modify(pair, predictor);
             registerFile.Update(dest, pair);
         }
         bus.Clear();

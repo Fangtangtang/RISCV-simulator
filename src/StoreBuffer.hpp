@@ -32,7 +32,7 @@ public:
      */
     bool Full();
 
-    void AddInstruction(const Instruction &instruction, const Index &entry);
+    void AddInstruction(const Instruction &instruction,const RegisterFile&registerFile, const Index &entry);
 
     /*
      * execute in one clock cycle

@@ -5,93 +5,67 @@
 
 class ALU {
 public:
-    //do arithmatic work
-    //return true if execute
-    static bool Execute(Instruction &instruction, const Number &nrs1, const Number &nrs2, Number &result);
+
+    static Number Execute(const InstructionType &type, const Number &nrs1, const Number &nrs2, Number &imme);
 
 };
 
-bool ALU::Execute(Instruction &instruction, const Number &nrs1, const Number &nrs2, Number &result) {
-    switch (instruction.instructionType) {
+Number ALU::Execute(const InstructionType &type, const Number &nrs1, const Number &nrs2, Number &imme) {
+    switch (type) {
         case BEQ:
-            if (nrs1 == nrs2)result = 1;
-            else result = 0;
-            return true;
+            if (nrs1 == nrs2)return 1;
+            else return 0;
         case BNE:
-            if (nrs1 != nrs2)result = 1;
-            else result = 0;
-            return true;
+            if (nrs1 != nrs2)return 1;
+            else return 0;
         case BLT:
         case SLT:
-            result = nrs1 < nrs2 ? 1 : 0;
-            return true;
+            return nrs1 < nrs2 ? 1 : 0;
         case BGE:
-            if (nrs1 >= nrs2)result = 1;
-            else result = 0;
-            return true;
+            if (nrs1 >= nrs2)return 1;
+            else return 0;
         case BLTU:
         case SLTU:
-            if ((UnsignedNumber) nrs1 < (UnsignedNumber) nrs2)result = 1;
-            else result = 0;
-            return true;
+            if ((UnsignedNumber) nrs1 < (UnsignedNumber) nrs2)return 1;
+            else return 0;
         case BGEU:
-            result = ((UnsignedNumber) nrs1 >= (UnsignedNumber) nrs2) ? 1 : 0;
-            return true;
+            return ((UnsignedNumber) nrs1 >= (UnsignedNumber) nrs2) ? 1 : 0;
         case ADDI:
-            if (instruction.rs1 == 0 && instruction.rd == 10 && instruction.immediate == 255) {
-                instruction.instructionType = EXIT;
-            } else result = nrs1 + instruction.immediate;
-            return true;
+            return nrs1 + imme;
         case SLTI:
-            result = nrs1 < instruction.immediate ? 1 : 0;
-            return true;
+            return nrs1 < imme ? 1 : 0;
         case SLTIU:
-            result = ((UnsignedNumber) nrs1 < (UnsignedNumber) instruction.immediate) ? 1 : 0;
-            return true;
+            return ((UnsignedNumber) nrs1 < (UnsignedNumber) imme) ? 1 : 0;
         case XORI:
-            result = nrs1 ^ instruction.immediate;
-            return true;
+            return nrs1 ^ imme;
         case ORI:
-            result = nrs1 | instruction.immediate;
-            return true;
+            return nrs1 | imme;
         case ANDI:
-            result = nrs1 & instruction.immediate;
-            return true;
+            return nrs1 & imme;
         case SLLI:
-            result = ((UnsignedNumber) nrs1 << instruction.immediate);
-            return true;
+            return ((UnsignedNumber) nrs1 << imme);
         case SRLI:
-            result = ((UnsignedNumber) nrs1 >> instruction.immediate);
-            return true;
+            return ((UnsignedNumber) nrs1 >> imme);
         case SRAI:
-            result = nrs1 >> instruction.immediate;
-            return true;
+            return nrs1 >> imme;
         case ADD:
-            result = nrs1 + nrs2;
-            return true;
+            return nrs1 + nrs2;
         case SUB:
-            result = nrs1 - nrs2;
-            return true;
+            return nrs1 - nrs2;
         case SLL:
-            result = nrs1 << nrs2;
-            return true;
+            return nrs1 << nrs2;
         case XOR:
-            result = nrs1 ^ nrs2;
-            return true;
+            return nrs1 ^ nrs2;
         case SRL:
-            result =(UnsignedNumber) nrs1 >> (nrs2& ((1 << 5) - 1));
-            return true;
+            return (UnsignedNumber) nrs1 >> (nrs2 & ((1 << 5) - 1));
         case SRA:
-            result = nrs1 >> (nrs2& ((1 << 5) - 1));
-            return true;
+            return nrs1 >> (nrs2 & ((1 << 5) - 1));
         case OR:
-            result = nrs1 | nrs2;
-            return true;
+            return nrs1 | nrs2;
         case AND:
-            result = nrs1 & nrs2;
-            return true;
+            return nrs1 & nrs2;
         default:
-            return false;//not execute in ALU
+            return 0;//not execute in ALU
     }
 }
 
