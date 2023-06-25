@@ -8,6 +8,8 @@ class Registers;
 
 class Memory;
 
+class RegisterFile;
+
 struct Register {
     RegisterUnit pre_state = 0;
     RegisterUnit after_state = 0;
@@ -18,6 +20,8 @@ class Registers {
     RegisterUnit PC = 0;//program counter
 
     friend class Memory;
+
+    friend class RegisterFile;
 
 public:
 
@@ -35,7 +39,7 @@ public:
 };
 
 void Registers::Update(const Byte &ind, const Number &value) {
-    aRegister[ind] = value;
+    if (ind) aRegister[ind] = value;
 }
 
 void Registers::ReadRegister(const Instruction &instruction, Number &nrs1, Number &nrs2) {

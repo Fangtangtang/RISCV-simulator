@@ -47,6 +47,7 @@ public:
      */
     void Modify(const std::pair<Index, Number> &pair);
 
+    void Clear();
 };
 
 void PCReservationStation::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile,
@@ -78,6 +79,10 @@ void PCReservationStation::Modify(const std::pair<Index, Number> &pair) {
     }
 }
 
+void PCReservationStation::Clear() {
+    busy = false;
+}
+
 class ReservationStation {
     RSType RS[8];
 public:
@@ -105,6 +110,7 @@ public:
      */
     void Modify(const std::pair<Index, Number> &pair);
 
+    void Clear();
 };
 
 Index ReservationStation::GetSpace() {
@@ -149,6 +155,12 @@ void ReservationStation::Modify(const std::pair<Index, Number> &pair) {
                 i.nrs2 = pair.second;
             }
         }
+    }
+}
+
+void ReservationStation::Clear() {
+    for (auto &i: RS) {
+        i.busy = false;
     }
 }
 

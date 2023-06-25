@@ -9,11 +9,11 @@
 
 #include "../include/queue.hpp"
 #include "../tool/decoder.hpp"
-#include "src/RegFile.hpp"
-#include "src/ReservationStation.hpp"
-#include "src/StoreBuffer.hpp"
-#include "src/LoadBuffer.hpp"
-#include "src/predictor.hpp"
+#include "RegFile.hpp"
+#include "ReservationStation.hpp"
+#include "StoreBuffer.hpp"
+#include "LoadBuffer.hpp"
+#include "predictor.hpp"
 
 class ReorderBuffer;
 
@@ -42,7 +42,7 @@ class ReorderBuffer {
 
     Index AddInstruction(const Instruction &instruction);
 
-    Index AddInstruction(const Instruction &instruction, RegisterUnit &pc);
+    Index AddInstruction(const Instruction &instruction, RegisterUnit &pc, Number &value);
 
     Index AddInstruction(const Instruction &instruction, const bool &predict, RegisterUnit &pc);
 
@@ -51,8 +51,9 @@ public:
      * try to add Instruction into RoB
      * if RoBQueue is full return -1
      * else return entry(index in RoBQueue.storage)
+     * RegFile need to be modified
      */
-    Index AddInstruction(const Instruction &instruction, const RegisterFile &registerFile, Predictor &predictor,
+    Index AddInstruction(const Instruction &instruction, RegisterFile &registerFile, Predictor &predictor,
                          ReservationStation &RS, StoreBuffer &storeBuffer,
                          LoadBuffer &loadBuffer, PCReservationStation &pcReservationStation,
                          RegisterUnit &pc);
@@ -66,9 +67,10 @@ public:
     /*
      * commit all the ready ones
      * if commit EXIT return true
+     * if incorrect predict flag=true
      * R[0]=0
      */
-    bool Commit(Registers &registers);
+    bool Commit(Registers &registers, bool &flag);
 };
 
 /*
@@ -80,7 +82,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction) {
     return RoBQueue.EnQueue(tmp);
 }
 
-Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterUnit &pc) {
+Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterUnit &pc, Number &value) {
     RoBType tmp(instruction);
     tmp.ready = true;
     switch (instruction.instructionType) {
@@ -128,7 +130,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const bool &
 /*
  * public
  */
-Index ReorderBuffer::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile,
+Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile &registerFile,
                                     Predictor &predictor,
                                     ReservationStation &RS, StoreBuffer &storeBuffer, LoadBuffer &loadBuffer,
                                     PCReservationStation &pcReservationStation,
@@ -150,6 +152,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const Regist
             pc += 4;
             entry = AddInstruction(instruction);
             loadBuffer.AddInstruction(instruction, registerFile, entry);
+            registerFile.Modify(instruction.rd, entry);
             return entry;
             //StoreBuffer
         case SB:
@@ -191,14 +194,18 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const Regist
             predict = predictor.Predict();
             entry = AddInstruction(instruction, predict, pc);
             RS.AddInstruction(ind, instruction, registerFile, entry);
+            if (instruction.rd < 32) registerFile.Modify(instruction.rd, entry);
             return entry;
         case LUI:
         case AUIPC:
         case JAL:
-            return AddInstruction(instruction, pc);
+            entry = AddInstruction(instruction, pc, value);
+            registerFile.Modify(instruction.rd, value);
+            return entry;
         case JALR://special pc depend on nrs1
             entry = AddInstruction(instruction);
             pcReservationStation.AddInstruction(instruction, registerFile, entry);
+            registerFile.Modify(instruction.rd, entry);
             return entry;
         default://no need to add into buffer(WAIT)
             return -1;
@@ -232,15 +239,28 @@ Byte ReorderBuffer::Modify(const std::pair<Index, Number> &pair, Predictor &pred
     return tmp.dest;
 }
 
-bool ReorderBuffer::Commit(Registers &registers) {
+bool ReorderBuffer::Commit(Registers &registers, bool &flag) {
     RoBType tmp;
     while (!RoBQueue.Empty()) {
         tmp = RoBQueue.GetHead();
         if (tmp.ready) {
+            if (tmp.type == EXIT)return true;
+            if (tmp.type == BEQ ||
+                tmp.type == BNE ||
+                tmp.type == BLT ||
+                tmp.type == BGE ||
+                tmp.type == BLTU ||
+                tmp.type == BGEU) {
+                if (!tmp.predict) {
+                    flag = true;
+                    RoBQueue.Clear();
+                }
+            }
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
         } else break;
     }
+    return false;
 }
 
 

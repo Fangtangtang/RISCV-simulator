@@ -40,7 +40,8 @@ public:
      * 3 clock cycle
      * return true if visit
      */
-    bool VisitMemory(const Instruction &instruction, const Number &nrs1, const Number &nrs2, Number &result);
+
+    Number VisitMemory(const InstructionType &type, const Number &nrs1, const Number &nrs2, const Number &imme);
 
     void PrintStack() {
         std::cout << "\nSTACK:\n";
@@ -67,31 +68,32 @@ void Memory::InstructionFetch(const MemoryAddr &addr, MachineCode &machineCode) 
     }
 }
 
-bool Memory::VisitMemory(const Instruction &instruction, const Number &nrs1, const Number &nrs2, Number &result) {
-    switch (instruction.instructionType) {
+Number Memory::VisitMemory(const InstructionType &type, const Number &nrs1, const Number &nrs2, const Number &imme) {
+    Number result;
+    switch (type) {
         case LB:
-            ReadByteFromMem(nrs1 + instruction.immediate, result);
+            ReadByteFromMem(nrs1 + imme, result);
             return true;
         case LH:
-            ReadHalfWordFromMem(nrs1 + instruction.immediate, result);
+            ReadHalfWordFromMem(nrs1 + imme, result);
             return true;
         case LW:
-            ReadWordFromMem(nrs1 + instruction.immediate, result);
+            ReadWordFromMem(nrs1 + imme, result);
             return true;
         case LBU:
-            ReadUnsignedByteFromMem(nrs1 + instruction.immediate, result);
+            ReadUnsignedByteFromMem(nrs1 + imme, result);
             return true;
         case LHU:
-            ReadUnsignedHalfWordFromMem(nrs1 + instruction.immediate, result);
+            ReadUnsignedHalfWordFromMem(nrs1 + imme, result);
             return true;
         case SB:
-            WriteByteInMem(nrs1 + instruction.immediate, nrs2);
+            WriteByteInMem(nrs1 + imme, nrs2);
             return true;
         case SH:
-            WriteHalfWordInMem(nrs1 + instruction.immediate, nrs2);
+            WriteHalfWordInMem(nrs1 + imme, nrs2);
             return true;
         case SW:
-            WriteWordInMem(nrs1 + instruction.immediate, nrs2);
+            WriteWordInMem(nrs1 + imme, nrs2);
             return true;
         default:
             return false;

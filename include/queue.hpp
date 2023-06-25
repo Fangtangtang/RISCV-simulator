@@ -49,6 +49,15 @@ public:
     void Modify(const T &ele, const Index &ind) {
         storage[ind] = ele;
     }
+
+    void Clear() {
+        front = rear = 0;
+    }
+
+    void HeadRear(Index &front_, Index &rear_) const {
+        front_ = front;
+        rear_ = rear;
+    }
 };
 
 #endif //CODE_QUEUE_HPP

@@ -27,4 +27,20 @@ public:
 
 };
 
+void CDB::Add(const Index &entry, Number &value) {
+    storage.emplace_back(entry, value);
+}
+
+int CDB::Size() const {
+    return storage.size();
+}
+
+std::pair<Index, Number> CDB::GetEle(const int &i) const {
+    return storage[i];
+}
+
+void CDB::Clear() {
+    storage.clear();
+}
+
 #endif //CODE_BUS_HPP

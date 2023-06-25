@@ -21,11 +21,11 @@ int main() {
     Predictor predictor;
     CDB bus;
     memory.Initialize();//scan all the code
-    registerFile.Reset();
+    registerFile.Reset(registers);
     RegisterUnit pc;//pc points at the address of code, used in IF
     MachineCode pre_machineCode = 0, after_machineCode = 0;
     Instruction instruction;
-    bool IP_flag = true;//instruction process flag
+    bool IP_flag = true, reset_flag = false;//instruction process flag
     Index entry;
     int size_;
     Byte dest;
@@ -49,9 +49,9 @@ int main() {
         //EX MEM
         if (!IP_flag && pcRS.Execute(bus, pc))
             IP_flag = true;
-        RS.Execute(bus,alu);
-        loadBuffer.Execute(bus);
-        storeBuffer.Execute(bus);
+        RS.Execute(bus, alu);
+        loadBuffer.Execute(bus, memory);
+        storeBuffer.Execute(bus, memory);
         size_ = bus.Size();
         for (int i = 0; i < size_; ++i) {
             pair = bus.GetEle(i);
@@ -64,7 +64,14 @@ int main() {
         }
         bus.Clear();
         //WB
-        if (RoB.Commit(registers)) break;
+        if (RoB.Commit(registers, reset_flag)) break;
+        if (reset_flag) {
+            registerFile.Reset(registers);
+            pcRS.Clear();
+            RS.Clear();
+            loadBuffer.Clear();
+            storeBuffer.Clear();
+        }
     }
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);
     return 0;
