@@ -11,8 +11,9 @@
 #include "../tool/decoder.hpp"
 #include "RegFile.hpp"
 #include "ReservationStation.hpp"
-#include "StoreBuffer.hpp"
-#include "LoadBuffer.hpp"
+//#include "StoreBuffer.hpp"
+//#include "LoadBuffer.hpp"
+#include "MemoryBuffer.hpp"
 #include "predictor.hpp"
 
 class ReorderBuffer;
@@ -62,8 +63,7 @@ public:
      * RegFile need to be modified
      */
     Index AddInstruction(const Instruction &instruction, RegisterFile &registerFile, Predictor &predictor,
-                         ReservationStation &RS, StoreBuffer &storeBuffer,
-                         LoadBuffer &loadBuffer, PCReservationStation &pcReservationStation,
+                         ReservationStation &RS, MemoryBuffer &memoryBuffer, PCReservationStation &pcReservationStation,
                          RegisterUnit &pc);
 
     /*
@@ -143,7 +143,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, const bool &
  */
 Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile &registerFile,
                                     Predictor &predictor,
-                                    ReservationStation &RS, StoreBuffer &storeBuffer, LoadBuffer &loadBuffer,
+                                    ReservationStation &RS, MemoryBuffer &memoryBuffer,
                                     PCReservationStation &pcReservationStation,
                                     RegisterUnit &pc) {
     if (RoBQueue.Full())
@@ -158,22 +158,23 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
         case LW:
         case LBU:
         case LHU:
-            if (loadBuffer.Full())
-                return -1;
-            pc += 4;
-            entry = AddInstruction(instruction);
-            loadBuffer.AddInstruction(instruction, registerFile, entry);
-            registerFile.Modify(instruction.rd, entry);
-            return entry;
+//            if (loadBuffer.Full())
+//                return -1;
+//            pc += 4;
+//            entry = AddInstruction(instruction);
+//            loadBuffer.AddInstruction(instruction, registerFile, entry);
+//            registerFile.Modify(instruction.rd, entry);
+//            return entry;
             //StoreBuffer
         case SB:
         case SH:
         case SW:
-            if (storeBuffer.Full())
+            if (memoryBuffer.Full())
                 return -1;
             pc += 4;
             entry = AddInstruction(instruction);
-            storeBuffer.AddInstruction(instruction, registerFile, entry);
+            memoryBuffer.AddInstruction(instruction, registerFile, entry);
+            registerFile.Modify(instruction.rd, entry);
             return entry;
         case BEQ:
         case BNE:
@@ -218,7 +219,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
             pcReservationStation.AddInstruction(instruction, registerFile, entry);
             return entry;
         case EXIT:
-             return AddInstruction(instruction, pc, value);
+            return AddInstruction(instruction, pc, value);
         default://no need to add into buffer(WAIT)
             return -1;
     }
