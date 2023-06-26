@@ -24,6 +24,8 @@ public:
     inline void Correct();
 
     void ChangeStatus(const bool &flag);
+
+    void ShowRate() const;
 };
 
 bool Predictor::Predict() {
@@ -43,6 +45,10 @@ void Predictor::ChangeStatus(const bool &flag) {
         return;
     }
     if (tmp)--status;
+}
+
+void Predictor::ShowRate() const {
+    std::cout << correct << ' ' << total << ' ' << (double) correct / total << '\n';
 }
 
 

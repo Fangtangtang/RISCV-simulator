@@ -11,8 +11,6 @@
 #include "../tool/decoder.hpp"
 #include "RegFile.hpp"
 #include "ReservationStation.hpp"
-//#include "StoreBuffer.hpp"
-//#include "LoadBuffer.hpp"
 #include "MemoryBuffer.hpp"
 #include "predictor.hpp"
 
@@ -176,6 +174,13 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
         case BGE:
         case BLTU:
         case BGEU:
+            ind = RS.GetSpace();
+            if (ind < 0)return -1;
+            predict = predictor.Predict();
+            entry = AddInstruction(instruction, predict, pc);
+            RS.AddInstruction(ind, instruction, registerFile, entry);
+            if (instruction.rd < 32) registerFile.Modify(instruction.rd, entry);
+            return entry;
         case ADDI:
         case SLTI:
         case SLTIU:
@@ -197,8 +202,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
         case AND:
             ind = RS.GetSpace();
             if (ind < 0)return -1;
-            predict = predictor.Predict();
-            entry = AddInstruction(instruction, predict, pc);
+            entry = AddInstruction(instruction, false, pc);
             RS.AddInstruction(ind, instruction, registerFile, entry);
             if (instruction.rd < 32) registerFile.Modify(instruction.rd, entry);
             return entry;
@@ -253,7 +257,6 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
         tmp = RoBQueue.GetHead();
         if (tmp.ready) {
             if (tmp.type == EXIT) {
-//                std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
                 return true;
             }
             if (tmp.type == BEQ ||
@@ -267,20 +270,12 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
                     pc = tmp.value;
                     RoBQueue.Clear();
                     ++counter;
-//                    if (counter>=30425&&counter<=31000)
-//                        registers.Print();
-//                    std::cout<<Convert(tmp.type)<<'\n';
-//                    std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
                     return false;
                 }
             }
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
             ++counter;
-//            if (counter>=30425&&counter<=31000)
-//                registers.Print();
-//            std::cout<<Convert(tmp.type)<<'\n';
-//            std::cout << "COMMIT: " << std::hex << pc << std::dec << '\t' << tmp << '\n';
         } else break;
     }
     return false;

@@ -73,8 +73,8 @@ enum InstructionType {
     /*
      * end of program
      */
-    EXIT // 0x0ff00513
-    , WAIT
+    EXIT, // 0x0ff00513
+    WAIT
 };
 
 /*

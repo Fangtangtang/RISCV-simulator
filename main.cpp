@@ -80,7 +80,7 @@ int main() {
             memoryBuffer.Clear();
             machineCode = 0;
             instruction.instructionType = WAIT;
-            process_flag= true;
+            process_flag = true;
             reset_flag = false;
         }
         ++clock;
@@ -92,13 +92,7 @@ int main() {
 //        loadBuffer.Print();
 //        storeBuffer.Print();
     }
+//    predictor.ShowRate();
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);
     return 0;
 }
-
-
-//            std::cout << clock << '\t' << std::hex << pc << std::dec << '\t' << Convert(instruction.instructionType)
-//                      << ' '
-//                      << unsigned(instruction.rs1) << ' ' << unsigned(instruction.rs2) << ' '
-//                      << unsigned(instruction.rd) << ' '
-//                      << instruction.immediate << '\n';

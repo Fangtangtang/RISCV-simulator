@@ -47,8 +47,6 @@ void Registers::ReadRegister(const Instruction &instruction, Number &nrs1, Numbe
     if (instruction.rs2 < 32) nrs2 = aRegister[instruction.rs2];
 }
 
-// TODO
-// included in UpdatePC or decode
 bool Registers::WriteBack(const Instruction &instruction, const Number &nrs1, const Number &result) {
     switch (instruction.instructionType) {
         case LUI:
