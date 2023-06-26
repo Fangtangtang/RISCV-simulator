@@ -265,16 +265,16 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
                     flag = true;
                     pc = tmp.value;
                     RoBQueue.Clear();
-                    registers.Print();
-                    std::cout<<Convert(tmp.type)<<'\n';
+//                    registers.Print();
+//                    std::cout<<Convert(tmp.type)<<'\n';
 //                    std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
                     return false;
                 }
             }
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
-            registers.Print();
-            std::cout<<Convert(tmp.type)<<'\n';
+//            registers.Print();
+//            std::cout<<Convert(tmp.type)<<'\n';
 //            std::cout << "COMMIT: " << std::hex << pc << std::dec << '\t' << tmp << '\n';
         } else break;
     }

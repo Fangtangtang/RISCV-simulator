@@ -81,7 +81,7 @@ enum InstructionType {
  * 指令信息
  */
 struct Instruction {
-    InstructionType instructionType = LUI;
+    InstructionType instructionType = WAIT;
     Number immediate = 0;//immediate number
     Byte rs1{}, rs2{};//register source
     Byte rd{};//register destination

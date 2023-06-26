@@ -6,13 +6,9 @@
 #include "src/ReservationStation.hpp"
 #include "src/MemoryBuffer.hpp"
 
-enum STATUS {
-    process, wait, pause
-};
-
 int main() {
-    freopen("/mnt/f/repo/RISCV-simulator/test.data", "r", stdin);
-    freopen("my.out", "w", stdout);
+//    freopen("/mnt/f/repo/RISCV-simulator/test.data", "r", stdin);
+//    freopen("my.out", "w", stdout);
     Decoder decoder;
     Memory memory{};
     Registers registers;
@@ -29,41 +25,37 @@ int main() {
     RegisterUnit pc;//pc points at the address of code, used in IF
     MachineCode machineCode = 0;
     Instruction instruction;
-    STATUS IP_flag = process;
-    bool reset_flag = false;//instruction process flag
+    bool process_flag = true, reset_flag = false;//instruction process flag
     Index entry;
     int size_;
     Byte dest;
-    int clock = 0;
+    uint64_t clock = 0;
     std::pair<Index, Number> pair;
-    while (true) {
-        ++clock;
-//        std::cout<<clock<<'\n';
-        if (IP_flag == process) {
-            //IF
+    while (true) {//simulate a clock cycle
+        /*
+         * IF and ID
+         * process together
+         * finish after 2 clock cycle
+         */
+        if (clock & 1 && process_flag && instruction.instructionType == WAIT) {
             memory.InstructionFetch(pc, machineCode);
-            //ID
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
         }
-        if (IP_flag != pause) {
-//            std::cout << clock << '\t' << std::hex << pc << std::dec << '\t' << Convert(instruction.instructionType)
-//                      << ' '
-//                      << unsigned(instruction.rs1) << ' ' << unsigned(instruction.rs2) << ' '
-//                      << unsigned(instruction.rd) << ' '
-//                      << instruction.immediate << '\n';
+        /*
+         * EXE
+         * try to add instruction into RoB
+         * process in every buffer
+         * broadcast and remove dependence
+         */
+        if (instruction.instructionType != WAIT) {
             entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, memoryBuffer, pcRS, pc);
+            if (instruction.instructionType == JALR ||
+                instruction.instructionType == EXIT) {
+                process_flag = false;//pause
+            }
+            if (entry >= 0) instruction.instructionType = WAIT;//instruction added
         }
-        if (entry == -1)IP_flag = wait;
-        else if (instruction.instructionType == JALR ||
-                 instruction.instructionType == EXIT) {//fail to add
-            IP_flag = pause;
-        } else {
-            IP_flag = process;//pc updated
-        }
-        //try to add into buffers
-        //EX MEM
-        if (IP_flag == pause && pcRS.Execute(bus, pc))
-            IP_flag = process;
+        if (!process_flag && pcRS.Execute(bus, pc)) process_flag = true;
         RS.Execute(bus, alu);
         memoryBuffer.Execute(bus, memory);
         size_ = bus.Size();
@@ -71,12 +63,15 @@ int main() {
             pair = bus.GetEle(i);
             RS.Modify(pair);
             memoryBuffer.Modify(pair);
-            if (IP_flag == pause)pcRS.Modify(pair);
+            if (!process_flag)pcRS.Modify(pair);
             dest = RoB.Modify(pair, predictor);
             registerFile.Update(dest, pair);
         }
         bus.Clear();
-        //WB
+        /*
+         * WB
+         * commit instructions
+         */
         if (RoB.Commit(registers, reset_flag, pc)) break;
         if (reset_flag) {
             registerFile.Reset(registers);
@@ -85,9 +80,10 @@ int main() {
             memoryBuffer.Clear();
             machineCode = 0;
             instruction.instructionType = WAIT;
-            IP_flag = process;
+            process_flag= true;
             reset_flag = false;
         }
+        ++clock;
 //        registerFile.Print();
 //        RoB.Print();
 //        registers.Print();
@@ -99,3 +95,10 @@ int main() {
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);
     return 0;
 }
+
+
+//            std::cout << clock << '\t' << std::hex << pc << std::dec << '\t' << Convert(instruction.instructionType)
+//                      << ' '
+//                      << unsigned(instruction.rs1) << ' ' << unsigned(instruction.rs2) << ' '
+//                      << unsigned(instruction.rd) << ' '
+//                      << instruction.immediate << '\n';
