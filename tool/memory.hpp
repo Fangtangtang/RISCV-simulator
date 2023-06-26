@@ -73,30 +73,30 @@ Number Memory::VisitMemory(const InstructionType &type, const Number &nrs1, cons
     switch (type) {
         case LB:
             ReadByteFromMem(nrs1 + imme, result);
-            return true;
+            return result;
         case LH:
             ReadHalfWordFromMem(nrs1 + imme, result);
-            return true;
+            return result;
         case LW:
             ReadWordFromMem(nrs1 + imme, result);
-            return true;
+            return result;
         case LBU:
             ReadUnsignedByteFromMem(nrs1 + imme, result);
-            return true;
+            return result;
         case LHU:
             ReadUnsignedHalfWordFromMem(nrs1 + imme, result);
-            return true;
+            return result;
         case SB:
             WriteByteInMem(nrs1 + imme, nrs2);
-            return true;
+            return 0;
         case SH:
             WriteHalfWordInMem(nrs1 + imme, nrs2);
-            return true;
+            return 0;
         case SW:
             WriteWordInMem(nrs1 + imme, nrs2);
-            return true;
+            return 0;
         default:
-            return false;
+            return 0;
     }
 }
 

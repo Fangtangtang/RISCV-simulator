@@ -35,6 +35,13 @@ public:
     RoBType(const Instruction &instruction, const bool &predict_) : type(instruction.instructionType),
                                                                     dest(instruction.rd),
                                                                     predict(predict_) {}
+
+    friend std::ostream &operator<<(std::ostream &os, const RoBType &obj) {
+        std::cout << Convert(obj.type) << ' ' << obj.ready << ' ' << (UnsignedNumber) obj.dest << ' ' << obj.value;
+        return os;
+    }
+
+
 };
 
 class ReorderBuffer {
@@ -47,6 +54,7 @@ class ReorderBuffer {
     Index AddInstruction(const Instruction &instruction, const bool &predict, RegisterUnit &pc);
 
 public:
+
     /*
      * try to add Instruction into RoB
      * if RoBQueue is full return -1
@@ -71,6 +79,8 @@ public:
      * R[0]=0
      */
     bool Commit(Registers &registers, bool &flag);
+
+    void Print();
 };
 
 /*
@@ -101,6 +111,7 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterUnit
         default:
             break;
     }
+    value = tmp.value;
     return RoBQueue.EnQueue(tmp);
 }
 
@@ -205,8 +216,9 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
         case JALR://special pc depend on nrs1
             entry = AddInstruction(instruction);
             pcReservationStation.AddInstruction(instruction, registerFile, entry);
-            registerFile.Modify(instruction.rd, entry);
             return entry;
+        case EXIT:
+             return AddInstruction(instruction, pc, value);
         default://no need to add into buffer(WAIT)
             return -1;
     }
@@ -236,6 +248,7 @@ Byte ReorderBuffer::Modify(const std::pair<Index, Number> &pair, Predictor &pred
     }
     tmp.ready = true;
     RoBQueue.Modify(tmp, pair.first);
+    if (tmp.type == SB || tmp.type == SH || tmp.type == SW) return 32;
     return tmp.dest;
 }
 
@@ -244,6 +257,7 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag) {
     while (!RoBQueue.Empty()) {
         tmp = RoBQueue.GetHead();
         if (tmp.ready) {
+            std::cout << "COMMIT: " << tmp << '\n';
             if (tmp.type == EXIT)return true;
             if (tmp.type == BEQ ||
                 tmp.type == BNE ||
@@ -261,6 +275,11 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag) {
         } else break;
     }
     return false;
+}
+
+void ReorderBuffer::Print() {
+    std::cout << "RoB:\n";
+    RoBQueue.Print();
 }
 
 

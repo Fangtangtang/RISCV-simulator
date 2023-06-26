@@ -35,6 +35,12 @@ public:
         Q1 = registerFile.GetValue(instruction.rs1, nrs1);
         Q2 = registerFile.GetValue(instruction.rs2, nrs2);
     }
+
+    friend std::ostream &operator<<(std::ostream &os, const SBType &obj) {
+        std::cout << Convert(obj.type) << ' ' << obj.nrs1 << ' ' << obj.nrs2 << ' ' << obj.imme << ' '
+                  << (Number) obj.Q1 << ' ' << (Number) obj.Q2 << ' ' << (Number) obj.RoB;
+        return os;
+    }
 };
 
 class StoreBuffer {
@@ -60,6 +66,8 @@ public:
     void Modify(const std::pair<Index, Number> &pair);
 
     void Clear();
+
+    void Print();
 };
 
 bool StoreBuffer::Full() {
@@ -73,18 +81,18 @@ void StoreBuffer::AddInstruction(const Instruction &instruction, const RegisterF
 
 void StoreBuffer::Execute(CDB &bus, Memory &memory) {
     Number value;
-    if (timer) {
-        if (timer == 1) {
-            SBType tmp = SBQueue.GetHead();
-            value = memory.VisitMemory(tmp.type, tmp.nrs1, tmp.nrs2, tmp.imme);
-            SBQueue.DeQueue();
-            bus.Add(tmp.RoB, value);
-        }
-        --timer;
-        return;
-    }
     if (!SBQueue.Empty()) {
-        timer = 3;
+        SBType tmp = SBQueue.GetHead();
+        if (timer) {
+            if (timer == 1) {
+                value = memory.VisitMemory(tmp.type, tmp.nrs1, tmp.nrs2, tmp.imme);
+                SBQueue.DeQueue();
+                bus.Add(tmp.RoB, value);
+            }
+            --timer;
+            return;
+        }
+        if (tmp.Q1 == -1 && tmp.Q2 == -1) timer = 3;
     }
 }
 
@@ -98,10 +106,12 @@ void StoreBuffer::Modify(const std::pair<Index, Number> &pair) {
         if (tmp.Q1 == pair.first) {
             tmp.Q1 = -1;
             tmp.nrs1 = pair.second;
+            SBQueue.Modify(tmp, head);
         }
         if (tmp.Q2 == pair.first) {
             tmp.Q2 = -1;
             tmp.nrs2 = pair.second;
+            SBQueue.Modify(tmp, head);
         }
         front = head;
     }
@@ -109,6 +119,11 @@ void StoreBuffer::Modify(const std::pair<Index, Number> &pair) {
 
 void StoreBuffer::Clear() {
     SBQueue.Clear();
+}
+
+void StoreBuffer::Print() {
+    std::cout << "STBuffer:\n";
+    SBQueue.Print();
 }
 
 

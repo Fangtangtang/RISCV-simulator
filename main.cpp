@@ -8,6 +8,8 @@
 #include "src/LoadBuffer.hpp"
 
 int main() {
+    freopen("/mnt/f/repo/RISCV-simulator/test.data", "r", stdin);
+    freopen("my.out", "w", stdout);
     Decoder decoder;
     Memory memory{};
     Registers registers;
@@ -23,7 +25,7 @@ int main() {
     memory.Initialize();//scan all the code
     registerFile.Reset(registers);
     RegisterUnit pc;//pc points at the address of code, used in IF
-    MachineCode pre_machineCode = 0, after_machineCode = 0;
+    MachineCode machineCode = 0;
     Instruction instruction;
     bool IP_flag = true, reset_flag = false;//instruction process flag
     Index entry;
@@ -33,19 +35,20 @@ int main() {
     while (true) {
         if (IP_flag) {
             //IF
-            pre_machineCode = after_machineCode;
-            memory.InstructionFetch(pc, after_machineCode);
+            memory.InstructionFetch(pc, machineCode);
             //ID
-            decoder.Decode(pre_machineCode, instruction);//decode machine code to get instruction
-            if (instruction.instructionType == JALR) IP_flag = false;//pc don't update in the clock cycle
+            decoder.Decode(machineCode, instruction);//decode machine code to get instruction
+//            if (instruction.instructionType == JALR)
+//                IP_flag = false;//pc don't update in the clock cycle
+            entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, storeBuffer, loadBuffer, pcRS, pc);
+            if (entry == -1 || instruction.instructionType == JALR ||
+                instruction.instructionType == EXIT) {//fail to add
+                IP_flag = false;
+            } else {
+                IP_flag = true;//pc updated
+            }
         }
         //try to add into buffers
-        entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, storeBuffer, loadBuffer, pcRS, pc);
-        if (entry < 0) {//fail to add
-            IP_flag = false;
-        } else {
-            IP_flag = true;
-        }
         //EX MEM
         if (!IP_flag && pcRS.Execute(bus, pc))
             IP_flag = true;
@@ -72,6 +75,11 @@ int main() {
             loadBuffer.Clear();
             storeBuffer.Clear();
         }
+//        registerFile.Print();
+//        RoB.Print();
+//        RS.Print();
+        loadBuffer.Print();
+//        storeBuffer.Print();
     }
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);
     return 0;

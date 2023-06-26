@@ -445,5 +445,86 @@ Byte Decoder::RegisterDestination(const MachineCode &machineCode) {
     return Byte((machineCode >> 7) & ((1 << 5) - 1));
 }
 
+std::string Convert(const InstructionType &instructionType) {
+    switch (instructionType) {
+        case LUI:
+            return "LUI";
+        case AUIPC:
+            return "AUIPC";
+        case JAL:
+            return "JAL";
+        case JALR:
+            return "JALR";
+        case BEQ:
+            return "BEQ";
+        case BNE:
+            return "BNE";
+        case BLT:
+            return "BLT";
+        case BGE:
+            return "BGE";
+        case BLTU:
+            return "BLTU";
+        case BGEU:
+            return "BGEU";
+        case LB:
+            return "LB";
+        case LH:
+            return "LH";
+        case LW:
+            return "LW";
+        case LBU:
+            return "LBU";
+        case LHU:
+            return "LHU";
+        case SB:
+            return "SB";
+        case SH:
+            return "SH";
+        case SW:
+            return "SW";
+        case ADDI:
+            return "ADDI";
+        case SLTI:
+            return "SLTI";
+        case SLTIU:
+            return "SLTIU";
+        case XORI:
+            return "XORI";
+        case ORI:
+            return "ORI";
+        case ANDI:
+            return "ANDI";
+        case SLLI:
+            return "SLLI";
+        case SRLI:
+            return "SRLI";
+        case SRAI:
+            return "SRAI";
+        case ADD:
+            return "ADD";
+        case SUB:
+            return "SUB";
+        case SLL:
+            return "SLL";
+        case SLT:
+            return "SLT";
+        case SLTU:
+            return "SLTU";
+        case XOR:
+            return "XOR";
+        case SRL:
+            return "SRL";
+        case SRA:
+            return "SRA";
+        case OR:
+            return "OR";
+        case AND:
+            return "AND";
+        case EXIT:
+            return "EXIT";
+    }
+    return "ERROR";
+}
 
 #endif //CODE_DECODER_HPP

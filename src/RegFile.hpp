@@ -47,6 +47,8 @@ public:
      * return dependence or value of RF[ind]
      */
     Index GetValue(const Byte &ind, Number &value) const;
+
+    void Print();
 };
 
 void RegisterFile::Reset(const Registers &registers) {
@@ -65,15 +67,23 @@ void RegisterFile::Modify(const Byte &ind, const Number &value) {
 }
 
 void RegisterFile::Update(const Byte &dest, const std::pair<Index, Number> &pair) {
-    if (storage[dest].dependence == pair.first) {
+    if (dest && dest != 32 && storage[dest].dependence == pair.first) {
         storage[dest].value = pair.second;
         storage[dest].dependence = -1;
     }
 }
 
 Index RegisterFile::GetValue(const Byte &ind, Number &value) const {
+    if (ind == 32)return -1;
     if (storage[ind].dependence == -1) value = storage[ind].value;
     return storage[ind].dependence;
+}
+
+void RegisterFile::Print() {
+    std::cout << "RegFile:\n";
+    for (auto &i: storage) {
+        std::cout << i.value << ' ' << (Number) i.dependence << '\n';
+    }
 }
 
 

@@ -32,6 +32,12 @@ public:
                                  imme(instruction.immediate), RoB(entry) {
         Q = registerFile.GetValue(instruction.rs1, nrs1);
     }
+
+    friend std::ostream &operator<<(std::ostream &os, const LBType &obj) {
+        std::cout << Convert(obj.type) << ' ' << obj.nrs1 << ' ' << obj.imme << ' ' << (Number) obj.Q << ' '
+                  << (Number) obj.RoB;
+        return os;
+    }
 };
 
 class LoadBuffer {
@@ -57,6 +63,8 @@ public:
     void Modify(const std::pair<Index, Number> &pair);
 
     void Clear();
+
+    void Print();
 };
 
 bool LoadBuffer::Full() {
@@ -70,18 +78,18 @@ void LoadBuffer::AddInstruction(const Instruction &instruction, const RegisterFi
 
 void LoadBuffer::Execute(CDB &bus, Memory &memory) {
     Number value;
-    if (timer) {
-        if (timer == 1) {
-            LBType tmp = LBQueue.GetHead();
-            value = memory.VisitMemory(tmp.type, tmp.nrs1, 0, tmp.imme);
-            LBQueue.DeQueue();
-            bus.Add(tmp.RoB, value);
-        }
-        --timer;
-        return;
-    }
     if (!LBQueue.Empty()) {
-        timer = 3;
+        LBType tmp = LBQueue.GetHead();
+        if (timer) {
+            if (timer == 1) {
+                value = memory.VisitMemory(tmp.type, tmp.nrs1, 0, tmp.imme);
+                LBQueue.DeQueue();
+                bus.Add(tmp.RoB, value);
+            }
+            --timer;
+            return;
+        }
+        if (tmp.Q == -1) timer = 3;
     }
 }
 
@@ -95,6 +103,7 @@ void LoadBuffer::Modify(const std::pair<Index, Number> &pair) {
         if (tmp.Q == pair.first) {
             tmp.Q = -1;
             tmp.nrs1 = pair.second;
+            LBQueue.Modify(tmp,head);
         }
         front = head;
     }
@@ -102,6 +111,11 @@ void LoadBuffer::Modify(const std::pair<Index, Number> &pair) {
 
 void LoadBuffer::Clear() {
     LBQueue.Clear();
+}
+
+void LoadBuffer::Print() {
+    std::cout << "LBBuffer:\n";
+    LBQueue.Print();
 }
 
 

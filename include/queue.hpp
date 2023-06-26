@@ -1,6 +1,7 @@
 #ifndef CODE_QUEUE_HPP
 #define CODE_QUEUE_HPP
 
+#include <iostream>
 #include "../include/type.hpp"
 
 template<class T>
@@ -57,6 +58,14 @@ public:
     void HeadRear(Index &front_, Index &rear_) const {
         front_ = front;
         rear_ = rear;
+    }
+
+    void Print() {
+        Index i = front;
+        while (i != rear) {
+            i = (i + 1) % size;
+            std::cout << storage[i] << '\n';
+        }
     }
 };
 

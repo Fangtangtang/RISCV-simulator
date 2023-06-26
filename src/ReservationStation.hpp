@@ -19,17 +19,24 @@ class RSType {
     InstructionType type;
     Number nrs1{}, nrs2{};
     Number Imme{};
-    Index Q1{}, Q2{};
+    Index Q1 = -1, Q2 = -1;
     Index RoB{};
 
     friend class ReservationStation;
+
+    friend std::ostream &operator<<(std::ostream &os, const RSType &obj) {
+        std::cout << obj.busy << " " << Convert(obj.type) << ' ' << obj.nrs1 << ' ' << obj.nrs2 << ' '
+                  << obj.Imme << ' ' << (Number) obj.Q1 << ' ' << (Number) obj.Q2 << ' '
+                  << (Number) obj.RoB;
+        return os;
+    }
 };
 
 class PCReservationStation {
     bool busy = false;
     Number nrs1{};
     Number imme{};
-    Index Q{};
+    Index Q = -1;
     Index RoB{};
 public:
     void AddInstruction(const Instruction &instruction, const RegisterFile &registerFile, const Index &entry);
@@ -48,6 +55,8 @@ public:
     void Modify(const std::pair<Index, Number> &pair);
 
     void Clear();
+
+
 };
 
 void PCReservationStation::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile,
@@ -83,6 +92,7 @@ void PCReservationStation::Clear() {
     busy = false;
 }
 
+
 class ReservationStation {
     RSType RS[8];
 public:
@@ -111,6 +121,8 @@ public:
     void Modify(const std::pair<Index, Number> &pair);
 
     void Clear();
+
+    void Print();
 };
 
 Index ReservationStation::GetSpace() {
@@ -161,6 +173,13 @@ void ReservationStation::Modify(const std::pair<Index, Number> &pair) {
 void ReservationStation::Clear() {
     for (auto &i: RS) {
         i.busy = false;
+    }
+}
+
+void ReservationStation::Print() {
+    std::cout << "RS:\n";
+    for (int i = 0; i < 8; ++i) {
+        std::cout << i << ": " << RS[i] << '\n';
     }
 }
 
