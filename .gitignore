@@ -9,3 +9,5 @@ code
 testcases/
 sample/
 test.data
+judge.sh
+my.out

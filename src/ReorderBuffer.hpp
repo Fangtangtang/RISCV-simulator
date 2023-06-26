@@ -78,7 +78,7 @@ public:
      * if incorrect predict flag=true
      * R[0]=0
      */
-    bool Commit(Registers &registers, bool &flag);
+    bool Commit(Registers &registers, bool &flag, RegisterUnit &pc);
 
     void Print();
 };
@@ -253,7 +253,7 @@ Byte ReorderBuffer::Modify(const std::pair<Index, Number> &pair, Predictor &pred
     return tmp.dest;
 }
 
-bool ReorderBuffer::Commit(Registers &registers, bool &flag) {
+bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
     RoBType tmp;
     while (!RoBQueue.Empty()) {
         tmp = RoBQueue.GetHead();
@@ -268,7 +268,9 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag) {
                 tmp.type == BGEU) {
                 if (!tmp.predict) {
                     flag = true;
+                    pc = tmp.value;
                     RoBQueue.Clear();
+                    return false;
                 }
             }
             RoBQueue.DeQueue();

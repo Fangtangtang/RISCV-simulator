@@ -22,8 +22,6 @@ int main() {
     ReorderBuffer RoB;
     ReservationStation RS;
     PCReservationStation pcRS{};
-//    StoreBuffer storeBuffer;
-//    LoadBuffer loadBuffer;
     MemoryBuffer memoryBuffer;
     RegisterFile registerFile;
     Predictor predictor;
@@ -45,9 +43,6 @@ int main() {
             memory.InstructionFetch(pc, machineCode);
             //ID
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
-//            if (instruction.instructionType == JALR)
-//                IP_flag = false;//pc don't update in the clock cycle
-//            entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, storeBuffer, loadBuffer, pcRS, pc);
         }
         if (IP_flag != pause)
             entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, memoryBuffer, pcRS, pc);
@@ -63,15 +58,11 @@ int main() {
         if (IP_flag == pause && pcRS.Execute(bus, pc))
             IP_flag = process;
         RS.Execute(bus, alu);
-//        loadBuffer.Execute(bus, memory);
-//        storeBuffer.Execute(bus, memory);
         memoryBuffer.Execute(bus, memory);
         size_ = bus.Size();
         for (int i = 0; i < size_; ++i) {
             pair = bus.GetEle(i);
             RS.Modify(pair);
-//            loadBuffer.Modify(pair);
-//            storeBuffer.Modify(pair);
             memoryBuffer.Modify(pair);
             if (IP_flag == pause)pcRS.Modify(pair);
             dest = RoB.Modify(pair, predictor);
@@ -79,18 +70,17 @@ int main() {
         }
         bus.Clear();
         //WB
-        if (RoB.Commit(registers, reset_flag)) break;
+        if (RoB.Commit(registers, reset_flag, pc)) break;
         if (reset_flag) {
             registerFile.Reset(registers);
             pcRS.Clear();
             RS.Clear();
-//            loadBuffer.Clear();
-//            storeBuffer.Clear();
             memoryBuffer.Clear();
+            reset_flag = false;
         }
-        registerFile.Print();
-        RoB.Print();
-        registers.Print();
+//        registerFile.Print();
+//        RoB.Print();
+//        registers.Print();
 //        RS.Print();
 //        memoryBuffer.Print();
 //        loadBuffer.Print();
