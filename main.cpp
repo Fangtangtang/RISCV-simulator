@@ -4,8 +4,6 @@
 #include "src/predictor.hpp"
 #include "src/RegFile.hpp"
 #include "src/ReservationStation.hpp"
-//#include "src/StoreBuffer.hpp"
-//#include "src/LoadBuffer.hpp"
 #include "src/MemoryBuffer.hpp"
 
 enum STATUS {
@@ -36,16 +34,25 @@ int main() {
     Index entry;
     int size_;
     Byte dest;
+    int clock = 0;
     std::pair<Index, Number> pair;
     while (true) {
+        ++clock;
+//        std::cout<<clock<<'\n';
         if (IP_flag == process) {
             //IF
             memory.InstructionFetch(pc, machineCode);
             //ID
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
         }
-        if (IP_flag != pause)
+        if (IP_flag != pause) {
+//            std::cout << clock << '\t' << std::hex << pc << std::dec << '\t' << Convert(instruction.instructionType)
+//                      << ' '
+//                      << unsigned(instruction.rs1) << ' ' << unsigned(instruction.rs2) << ' '
+//                      << unsigned(instruction.rd) << ' '
+//                      << instruction.immediate << '\n';
             entry = RoB.AddInstruction(instruction, registerFile, predictor, RS, memoryBuffer, pcRS, pc);
+        }
         if (entry == -1)IP_flag = wait;
         else if (instruction.instructionType == JALR ||
                  instruction.instructionType == EXIT) {//fail to add
@@ -76,6 +83,9 @@ int main() {
             pcRS.Clear();
             RS.Clear();
             memoryBuffer.Clear();
+            machineCode = 0;
+            instruction.instructionType = WAIT;
+            IP_flag = process;
             reset_flag = false;
         }
 //        registerFile.Print();

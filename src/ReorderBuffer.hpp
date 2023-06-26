@@ -158,13 +158,6 @@ Index ReorderBuffer::AddInstruction(const Instruction &instruction, RegisterFile
         case LW:
         case LBU:
         case LHU:
-//            if (loadBuffer.Full())
-//                return -1;
-//            pc += 4;
-//            entry = AddInstruction(instruction);
-//            loadBuffer.AddInstruction(instruction, registerFile, entry);
-//            registerFile.Modify(instruction.rd, entry);
-//            return entry;
             //StoreBuffer
         case SB:
         case SH:
@@ -258,8 +251,10 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
     while (!RoBQueue.Empty()) {
         tmp = RoBQueue.GetHead();
         if (tmp.ready) {
-            std::cout << "COMMIT: " << tmp << '\n';
-            if (tmp.type == EXIT)return true;
+            if (tmp.type == EXIT) {
+//                std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
+                return true;
+            }
             if (tmp.type == BEQ ||
                 tmp.type == BNE ||
                 tmp.type == BLT ||
@@ -270,11 +265,17 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
                     flag = true;
                     pc = tmp.value;
                     RoBQueue.Clear();
+                    registers.Print();
+                    std::cout<<Convert(tmp.type)<<'\n';
+//                    std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
                     return false;
                 }
             }
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
+            registers.Print();
+            std::cout<<Convert(tmp.type)<<'\n';
+//            std::cout << "COMMIT: " << std::hex << pc << std::dec << '\t' << tmp << '\n';
         } else break;
     }
     return false;

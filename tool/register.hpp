@@ -39,7 +39,7 @@ public:
 };
 
 void Registers::Update(const Byte &ind, const Number &value) {
-    if (ind) aRegister[ind] = value;
+    if (ind && ind != 32) aRegister[ind] = value;
 }
 
 void Registers::ReadRegister(const Instruction &instruction, Number &nrs1, Number &nrs2) {
@@ -92,7 +92,7 @@ void Registers::Print() {
     for (int i = 0; i < 32; ++i) {
         std::cout << i << '\t' << aRegister[i] << '\n';
     }
-    std::cout << "PC\t" << PC << '\n';
+//    std::cout << "PC\t" << PC << '\n';
 }
 
 
