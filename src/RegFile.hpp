@@ -52,18 +52,18 @@ public:
 };
 
 void RegisterFile::Reset(const Registers &registers) {
-    for (int i = 0; i < 32; ++i) {
+    for (int i = 1; i < 32; ++i) {
         storage[i].value = registers.aRegister[i];
         storage[i].dependence = -1;
     }
 }
 
 void RegisterFile::Modify(const Byte &ind, const Index &entry) {
-    storage[ind].dependence = entry;
+    if (ind && ind != 32) storage[ind].dependence = entry;
 }
 
 void RegisterFile::Modify(const Byte &ind, const Number &value) {
-    storage[ind].value = value;
+    if (ind && ind != 32) storage[ind].value = value;
 }
 
 void RegisterFile::Update(const Byte &dest, const std::pair<Index, Number> &pair) {

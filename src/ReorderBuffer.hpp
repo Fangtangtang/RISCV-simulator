@@ -46,6 +46,7 @@ public:
 };
 
 class ReorderBuffer {
+    int counter = 0;
     Queue<RoBType> RoBQueue{8};
 
     Index AddInstruction(const Instruction &instruction);
@@ -265,7 +266,9 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
                     flag = true;
                     pc = tmp.value;
                     RoBQueue.Clear();
-//                    registers.Print();
+                    ++counter;
+//                    if (counter>=30425&&counter<=31000)
+//                        registers.Print();
 //                    std::cout<<Convert(tmp.type)<<'\n';
 //                    std::cout << "COMMIT: " << pc << '\t' << tmp << '\n';
                     return false;
@@ -273,7 +276,9 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
             }
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
-//            registers.Print();
+            ++counter;
+//            if (counter>=30425&&counter<=31000)
+//                registers.Print();
 //            std::cout<<Convert(tmp.type)<<'\n';
 //            std::cout << "COMMIT: " << std::hex << pc << std::dec << '\t' << tmp << '\n';
         } else break;

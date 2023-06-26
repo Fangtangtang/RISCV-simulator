@@ -89,11 +89,12 @@ Number Registers::ReadRegister() {
 
 void Registers::Print() {
     std::cout << "\nPrintReg\n";
+//    for (int i = 0; i <32 ; ++i) {
+//        std::cout<<i<<'\t'<<aRegister[i]<<'\n';
+//    }
     for (int i = 0; i < 32; ++i) {
-        std::cout << i << '\t' << aRegister[i] << '\n';
+        std::cout << aRegister[i] << ' ';
     }
-//    std::cout << "PC\t" << PC << '\n';
 }
-
 
 #endif //CODE_REGISTER_HPP
