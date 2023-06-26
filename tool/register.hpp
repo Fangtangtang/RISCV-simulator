@@ -87,9 +87,6 @@ Number Registers::ReadRegister() {
 
 void Registers::Print() {
     std::cout << "\nPrintReg\n";
-//    for (int i = 0; i <32 ; ++i) {
-//        std::cout<<i<<'\t'<<aRegister[i]<<'\n';
-//    }
     for (int i = 0; i < 32; ++i) {
         std::cout << aRegister[i] << ' ';
     }

@@ -259,7 +259,6 @@ void Decoder::DetermineBTypeFunct3(const MachineCode &machineCode, Instruction &
             break;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
 }
 
@@ -283,7 +282,6 @@ void Decoder::DetermineILTypeFunct3(const MachineCode &machineCode, Instruction 
             break;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
 }
 
@@ -310,7 +308,6 @@ bool Decoder::DetermineIATypeFunct3(const MachineCode &machineCode, Instruction 
             return true;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
     return false;
 }
@@ -329,7 +326,6 @@ void Decoder::DetermineSTypeFunct3(const MachineCode &machineCode, Instruction &
             break;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
 }
 
@@ -346,7 +342,6 @@ void Decoder::DetermineIImmeType(const MachineCode &machineCode, Instruction &in
             break;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
 }
 
@@ -383,7 +378,6 @@ void Decoder::DetermineRType(const MachineCode &machineCode, Instruction &instru
             break;
         default:
             break;
-//            std::cout << "UNEXPECTED FUNCT3!\n";
     }
 }
 

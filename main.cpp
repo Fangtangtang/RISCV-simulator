@@ -7,8 +7,6 @@
 #include "src/MemoryBuffer.hpp"
 
 int main() {
-//    freopen("/mnt/f/repo/RISCV-simulator/test.data", "r", stdin);
-//    freopen("my.out", "w", stdout);
     Decoder decoder;
     Memory memory{};
     Registers registers;
@@ -29,7 +27,7 @@ int main() {
     Index entry;
     int size_;
     Byte dest;
-    uint64_t clock = 0;
+    Byte clock = 2;
     std::pair<Index, Number> pair;
     while (true) {//simulate a clock cycle
         /*
@@ -37,7 +35,8 @@ int main() {
          * process together
          * finish after 2 clock cycle
          */
-        if (clock & 1 && process_flag && instruction.instructionType == WAIT) {
+        if (clock)--clock;
+        if (clock == 0 && process_flag && instruction.instructionType == WAIT) {
             memory.InstructionFetch(pc, machineCode);
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
         }
@@ -70,7 +69,7 @@ int main() {
         bus.Clear();
         /*
          * WB
-         * commit instructions
+         * commit one instruction at most
          */
         if (RoB.Commit(registers, reset_flag, pc)) break;
         if (reset_flag) {
@@ -83,14 +82,6 @@ int main() {
             process_flag = true;
             reset_flag = false;
         }
-        ++clock;
-//        registerFile.Print();
-//        RoB.Print();
-//        registers.Print();
-//        RS.Print();
-//        memoryBuffer.Print();
-//        loadBuffer.Print();
-//        storeBuffer.Print();
     }
 //    predictor.ShowRate();
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);

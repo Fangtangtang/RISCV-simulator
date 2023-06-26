@@ -253,7 +253,7 @@ Byte ReorderBuffer::Modify(const std::pair<Index, Number> &pair, Predictor &pred
 
 bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
     RoBType tmp;
-    while (!RoBQueue.Empty()) {
+    if (!RoBQueue.Empty()) {
         tmp = RoBQueue.GetHead();
         if (tmp.ready) {
             if (tmp.type == EXIT) {
@@ -276,7 +276,7 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
             RoBQueue.DeQueue();
             registers.Update(tmp.dest, tmp.value);
             ++counter;
-        } else break;
+        }
     }
     return false;
 }
