@@ -54,7 +54,7 @@ public:
      * execute in one clock cycle
      * if executed, push into bus
      */
-    void Execute(CDB &bus, Memory &memory);
+    void Execute(const bool &flag, CDB &bus, Memory &memory);
 
     /*
      * remove dependence
@@ -70,15 +70,17 @@ bool MemoryBuffer::Full() {
     return MemQueue.Full();
 }
 
-void MemoryBuffer::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile, const Index &entry) {
+void
+MemoryBuffer::AddInstruction(const Instruction &instruction, const RegisterFile &registerFile, const Index &entry) {
     MemType tmp(instruction, registerFile, entry);
     MemQueue.EnQueue(tmp);
 }
 
-void MemoryBuffer::Execute(CDB &bus, Memory &memory) {
+void MemoryBuffer::Execute(const bool &flag, CDB &bus, Memory &memory) {
     Number value;
     if (!MemQueue.Empty()) {
         MemType tmp = MemQueue.GetHead();
+        if(!flag&&(tmp.type == SW || tmp.type == SH || tmp.type == SB))return;
         if (timer) {
             if (timer == 1) {
                 value = memory.VisitMemory(tmp.type, tmp.nrs1, tmp.nrs2, tmp.imme);

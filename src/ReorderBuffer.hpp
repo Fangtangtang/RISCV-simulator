@@ -79,6 +79,8 @@ public:
      */
     bool Commit(Registers &registers, bool &flag, RegisterUnit &pc);
 
+    bool NextIsStore();
+
     void Print();
 };
 
@@ -284,6 +286,13 @@ bool ReorderBuffer::Commit(Registers &registers, bool &flag, RegisterUnit &pc) {
 void ReorderBuffer::Print() {
     std::cout << "RoB:\n";
     RoBQueue.Print();
+}
+
+bool ReorderBuffer::NextIsStore() {
+    if (RoBQueue.Empty())return false;
+    RoBType tmp = RoBQueue.GetHead();
+    if (tmp.type == SW || tmp.type == SH || tmp.type == SB) return true;
+    return false;
 }
 
 

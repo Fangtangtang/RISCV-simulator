@@ -24,6 +24,7 @@ int main() {
     MachineCode machineCode = 0;
     Instruction instruction;
     bool process_flag = true, reset_flag = false;//instruction process flag
+    bool store_flag = false;
     Index entry;
     int size_;
     Byte dest;
@@ -62,7 +63,7 @@ int main() {
         }
         if (!process_flag && pcRS.Execute(bus, pc)) process_flag = true;
         RS.Execute(bus, alu);
-        memoryBuffer.Execute(bus, memory);
+        memoryBuffer.Execute(store_flag,bus, memory);
         size_ = bus.Size();
         for (int i = 0; i < size_; ++i) {
             pair = bus.GetEle(i);
@@ -78,6 +79,7 @@ int main() {
          * commit one instruction at most
          */
         if (RoB.Commit(registers, reset_flag, pc)) break;
+        store_flag = RoB.NextIsStore();
         if (reset_flag) {
             registerFile.Reset(registers);
             pcRS.Clear();
