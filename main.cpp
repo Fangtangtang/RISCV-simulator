@@ -27,7 +27,9 @@ int main() {
     Index entry;
     int size_;
     Byte dest;
-    Byte clock = 2;
+//    Byte clock = 2;
+    uint64_t clock = 0;
+
     std::pair<Index, Number> pair;
     while (true) {//simulate a clock cycle
         /*
@@ -35,8 +37,12 @@ int main() {
          * process together
          * finish after 2 clock cycle
          */
-        if (clock)--clock;
-        if (clock == 0 && process_flag && instruction.instructionType == WAIT) {
+//        if (clock)--clock;
+//        if (clock == 0 && process_flag && instruction.instructionType == WAIT) {
+//            memory.InstructionFetch(pc, machineCode);
+//            decoder.Decode(machineCode, instruction);//decode machine code to get instruction
+//        }
+        if (clock & 1 && process_flag && instruction.instructionType == WAIT) {
             memory.InstructionFetch(pc, machineCode);
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
         }
@@ -82,6 +88,7 @@ int main() {
             process_flag = true;
             reset_flag = false;
         }
+        ++clock;
     }
 //    predictor.ShowRate();
     std::cout << ((UnsignedNumber) registers.ReadRegister() & 255);
