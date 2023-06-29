@@ -3,26 +3,17 @@
 
 #include <cstdint>
 
-
 using MachineCode = uint32_t;
 using MemoryUnit = uint8_t;
 
-
 using MemoryAddr = uint32_t;
 using RegisterUnit = int32_t;
-using RegisterIndex = uint8_t;
 using TwoBytes = uint16_t;
 
 using Index = int8_t;
 using Number = int32_t;
 using UnsignedNumber = uint32_t;
-using Word = int32_t;
-using HalfWord = int16_t;
 using Byte = int8_t;
-
-using UnsignedByte = uint8_t;
-using UnsignedWord = uint32_t;
-using UnsignedHalfWord = uint16_t;
 
 inline Number SignExtend(const Number &number, const int ini_size) {
     if (ini_size == 8)return ((number & 0xff) | ((number & 0x80) ? 0xffffff00 : 0x0));
@@ -32,6 +23,5 @@ inline Number SignExtend(const Number &number, const int ini_size) {
     if (ini_size == 21) return ((number & 0x1fffff) | ((number & 0x100000) ? 0xfffe00000 : 0x0));
     return number;
 }
-
 
 #endif //CODE_TYPE_HPP

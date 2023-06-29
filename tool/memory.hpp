@@ -43,13 +43,6 @@ public:
 
     Number VisitMemory(const InstructionType &type, const Number &nrs1, const Number &nrs2, const Number &imme);
 
-    void PrintStack() {
-        std::cout << "\nSTACK:\n";
-        for (int i = 4660; i < 4680; ++i) {
-            std::cout << std::hex << i << ' ' << std::dec << i << '\t' << storage[i] << '\n';
-        }
-        std::cout << "\n";
-    }
 };
 
 void Memory::Initialize() {

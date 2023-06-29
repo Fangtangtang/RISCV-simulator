@@ -10,11 +10,6 @@ class Memory;
 
 class RegisterFile;
 
-struct Register {
-    RegisterUnit pre_state = 0;
-    RegisterUnit after_state = 0;
-};
-
 class Registers {
     RegisterUnit aRegister[32] = {0};
     RegisterUnit PC = 0;//program counter
