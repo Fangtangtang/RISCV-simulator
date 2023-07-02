@@ -63,11 +63,14 @@ void RegisterFile::Modify(const Byte &ind, const Index &entry) {
 }
 
 void RegisterFile::Modify(const Byte &ind, const Number &value) {
-    if (ind && ind != 32) storage[ind].value = value;
+    if (ind && ind != 32) {
+        storage[ind].value = value;
+        storage[ind].dependence=-1;
+    }
 }
 
 void RegisterFile::Update(const Byte &dest, const std::pair<Index, Number> &pair) {
-    if (dest && dest != 32 && storage[dest].dependence == pair.first) {
+    if (dest && dest < 32 && storage[dest].dependence == pair.first) {
         storage[dest].value = pair.second;
         storage[dest].dependence = -1;
     }

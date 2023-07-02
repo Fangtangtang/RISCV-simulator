@@ -85,6 +85,7 @@ void Registers::Print() {
     for (int i = 0; i < 32; ++i) {
         std::cout << aRegister[i] << ' ';
     }
+    std::cout<<'\n';
 }
 
 #endif //CODE_REGISTER_HPP

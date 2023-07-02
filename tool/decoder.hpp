@@ -517,6 +517,8 @@ std::string Convert(const InstructionType &instructionType) {
             return "AND";
         case EXIT:
             return "EXIT";
+        case WAIT:
+            return "WAIT";
     }
     return "ERROR";
 }

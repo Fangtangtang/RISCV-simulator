@@ -7,6 +7,7 @@
 #include "src/MemoryBuffer.hpp"
 
 int main() {
+//    freopen("out","w",stdout);
     Decoder decoder;
     Memory memory{};
     Registers registers;
@@ -16,7 +17,8 @@ int main() {
     PCReservationStation pcRS{};
     MemoryBuffer memoryBuffer;
     RegisterFile registerFile;
-    Predictor predictor;
+//    Predictor predictor;
+    Predictor1 predictor;
     CDB bus;
     memory.Initialize();//scan all the code
     registerFile.Reset(registers);
@@ -40,7 +42,7 @@ int main() {
         if (clock == 0 && process_flag && instruction.instructionType == WAIT) {
             memory.InstructionFetch(pc, machineCode);
             decoder.Decode(machineCode, instruction);//decode machine code to get instruction
-            clock=2;
+            clock = 2;
         }
         /*
          * EXE
@@ -58,7 +60,7 @@ int main() {
         }
         if (!process_flag && pcRS.Execute(bus, pc)) process_flag = true;
         RS.Execute(bus, alu);
-        memoryBuffer.Execute(store_flag,bus, memory);
+        memoryBuffer.Execute(store_flag, bus, memory);
         size_ = bus.Size();
         for (int i = 0; i < size_; ++i) {
             pair = bus.GetEle(i);
